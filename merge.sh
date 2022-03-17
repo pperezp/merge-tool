@@ -44,42 +44,58 @@ function ask(){
     done
 }
 
+function rollbackMerge(){
+    git merge --abort
+}
+
+function showConflicts(){
+    redMessage "============================"
+    rollbackMerge
+    git merge $MAIN_BRANCH | grep CONFLICTO > $CURRENT_PATH/merge-output
+    cat $CURRENT_PATH/merge-output
+    rm $CURRENT_PATH/merge-output
+    redMessage "============================"
+}
+
 function update(){
-    blueTitleMessage "Update $2..."
-    cd $1
+    folder=$1
+    project_name=$2
+
+    blueTitleMessage "Update $project_name..."
+
+    cd $folder
     git checkout $MAIN_BRANCH
     git pull
     git checkout $WORK_BRANCH
-    greenTitleMessage "$2 Done!."
+    greenTitleMessage "$project_name done!"
+    
     echo ""
 }
 
 function merge(){
-    blueTitleMessage "[$2] Try to merge $MAIN_BRANCH into $WORK_BRANCH..."
-    cd $1
+    folder=$1
+    project_name=$2
+
+    blueTitleMessage "[$project_name] Try to merge $MAIN_BRANCH into $WORK_BRANCH..."
+
+    cd $folder
     git checkout $WORK_BRANCH
     output=$(git merge $MAIN_BRANCH)
 
     if [[ "$output" == *"falló"* ]]; then
-        redTitleMessage "[$2] Merge fallido"
-        redMessage "============================"
-        git merge --abort
-        git merge $MAIN_BRANCH | grep CONFLICTO > $CURRENT_PATH/merge-output
-        cat $CURRENT_PATH/merge-output
-        rm $CURRENT_PATH/merge-output
-        redMessage "============================"
-        
-        blueTitleMessage "[$2] Try to do a rollback (git merge --abort)..."
-        git merge --abort
-        greenTitleMessage "[$2] Rollback done!."
+        redTitleMessage "[$project_name] Merge fallido"
+        showConflicts
+        blueTitleMessage "[$project_name] Try to do a rollback (git merge --abort)..."
+        rollbackMerge
+        greenTitleMessage "[$project_name] Rollback done!"
 
-        failedProjects+=($2)
+        failedProjects+=($project_name)
     else
-        okProjects+=($2)
+        okProjects+=($project_name)
     fi
 
     # ask
-    greenTitleMessage "[$2] Merged!."
+    greenTitleMessage "[$project_name] Merged!."
     echo ""
 }
 
