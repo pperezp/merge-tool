@@ -22,6 +22,18 @@ function redMessage() {
     echo -e "\e[31m$1\e[0m"
 }
 
+function blueTitleMessage(){
+    blueMessage "[$1]"
+}
+
+function greenTitleMessage(){
+    greenMessage "[$1]"
+}
+
+function redTitleMessage(){
+    redMessage "[$1]"
+}
+
 function ask(){
     while true; do
         read -p "Continue? [Y/n]: " yn
@@ -33,41 +45,42 @@ function ask(){
 }
 
 function update(){
-    blueMessage "Update $2..."
+    blueTitleMessage "Update $2..."
     cd $1
     git checkout $MAIN_BRANCH
     git pull
     git checkout $WORK_BRANCH
-    echo -e "\e[32m$2 Done!.\e[0m"
+    greenTitleMessage "$2 Done!."
+    echo ""
 }
 
 function merge(){
-    echo -e "\e[34mMerge $2...\e[0m"
+    blueTitleMessage "[$2] Try to merge $MAIN_BRANCH into $WORK_BRANCH..."
     cd $1
     git checkout $WORK_BRANCH
     output=$(git merge $MAIN_BRANCH)
 
     if [[ "$output" == *"falló"* ]]; then
-        echo -e "\e[31m$2 merge falló\e[0m"
-        echo -e "\e[31m============================\e[0m"
+        redTitleMessage "[$2] Merge fallido"
+        redMessage "============================"
         git merge --abort
         git merge $MAIN_BRANCH | grep CONFLICTO > $CURRENT_PATH/merge-output
         cat $CURRENT_PATH/merge-output
         rm $CURRENT_PATH/merge-output
-        echo -e "\e[31m============================\e[0m"
+        redMessage "============================"
         
-        echo -e "\e[34mRollback (git merge --abort)...\e[0m"
+        blueTitleMessage "[$2] Try to do a rollback (git merge --abort)..."
         git merge --abort
-        echo -e "\e[32m$2 Done!.\e[0m"
+        greenTitleMessage "[$2] Rollback done!."
+
         failedProjects+=($2)
-        echo "add $2 to fail"
-        #exit
     else
         okProjects+=($2)
-        echo "add $2 to ok"
     fi
+
     # ask
-    echo -e "\e[32m$2 Done!.\e[0m"
+    greenTitleMessage "[$2] Merged!."
+    echo ""
 }
 
 function updateCall(){
@@ -95,14 +108,16 @@ function mergeCall(){
 }
 
 function showResults(){
-    greenMessage "[MERGED]"
+    greenTitleMessage "MERGED $MAIN_BRANCH into $WORK_BRANCH"
     for project in ${okProjects[@]}; do
-        echo $project
+        echo -e "\e[32m✔\e[0m $project"
     done
 
-    redMessage "[FAILED]"
+    echo ""
+
+    redTitleMessage "FAILED (Merge was aborted)"
     for project in ${failedProjects[@]}; do
-        echo $project
+        echo -e "\e[31m✘\e[0m $project"
     done
 }
 
