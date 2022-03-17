@@ -87,7 +87,7 @@ function merge(){
     output=$(git merge $MAIN_BRANCH)
 
     if [[ "$output" == *"falló"* ]]; then
-        red_title_message "[$project_name] Merge fallido"
+        red_title_message "[$project_name] Merge has failed"
         show_conflicts
         blue_title_message "[$project_name] Try to abort merge (git merge --abort)..."
         abort_merge
