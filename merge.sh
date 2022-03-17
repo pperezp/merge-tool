@@ -1,37 +1,39 @@
 #!/bin/bash
 
-WORK_BRANCH=feature/GOW-2845
+# Description: 
+#   MAIN_BRANCH will pull and WORK_BRANCH will merge with MAIN_BRANCH
+
 MAIN_BRANCH=master
+WORK_BRANCH=feature/GOW-2845
 MICROSERVICES=/home/prez/awto/microservices
-CURRENT_PATH=$PWD
+GOWGO_PATH=/home/prez/awto/awto-gowgo-migration-project
 
-okProjects=()
-failedProjects=()
+ok_projects=()
+failed_projects=()
+conflict_files_counts=()
 
-echo $CURRENT_PATH
-
-function blueMessage(){
+function blue_message(){
     echo -e "\e[34m$1\e[0m"
 }
 
-function greenMessage() {
+function green_message() {
     echo -e "\e[32m$1\e[0m"
 }
 
-function redMessage() {
+function red_message() {
     echo -e "\e[31m$1\e[0m"
 }
 
-function blueTitleMessage(){
-    blueMessage "[$1]"
+function blue_title_message(){
+    blue_message "[$1]"
 }
 
-function greenTitleMessage(){
-    greenMessage "[$1]"
+function green_title_message(){
+    green_message "[$1]"
 }
 
-function redTitleMessage(){
-    redMessage "[$1]"
+function red_title_message(){
+    red_message "[$1]"
 }
 
 function ask(){
@@ -44,30 +46,32 @@ function ask(){
     done
 }
 
-function rollbackMerge(){
+function abort_merge(){
     git merge --abort
 }
 
-function showConflicts(){
-    redMessage "============================"
-    rollbackMerge
-    git merge $MAIN_BRANCH | grep CONFLICTO > $CURRENT_PATH/merge-output
-    cat $CURRENT_PATH/merge-output
-    rm $CURRENT_PATH/merge-output
-    redMessage "============================"
+function show_conflicts(){
+    red_message "============================"
+    abort_merge
+    git merge $MAIN_BRANCH | grep CONFLICTO > $PWD/merge-output
+    conflict_files_count=$(wc -l < $PWD/merge-output)
+    conflict_files_counts+=($conflict_files_count)
+    cat $PWD/merge-output
+    rm $PWD/merge-output
+    red_message "============================"
 }
 
-function update(){
+function pull(){
     folder=$1
     project_name=$2
 
-    blueTitleMessage "Update $project_name..."
+    blue_title_message "Pull $project_name..."
 
     cd $folder
     git checkout $MAIN_BRANCH
     git pull
     git checkout $WORK_BRANCH
-    greenTitleMessage "$project_name done!"
+    green_title_message "$project_name has pulled!"
     
     echo ""
 }
@@ -76,43 +80,43 @@ function merge(){
     folder=$1
     project_name=$2
 
-    blueTitleMessage "[$project_name] Try to merge $MAIN_BRANCH into $WORK_BRANCH..."
+    blue_title_message "[$project_name] Try to merge $MAIN_BRANCH into $WORK_BRANCH..."
 
     cd $folder
     git checkout $WORK_BRANCH
     output=$(git merge $MAIN_BRANCH)
 
     if [[ "$output" == *"falló"* ]]; then
-        redTitleMessage "[$project_name] Merge fallido"
-        showConflicts
-        blueTitleMessage "[$project_name] Try to do a rollback (git merge --abort)..."
-        rollbackMerge
-        greenTitleMessage "[$project_name] Rollback done!"
+        red_title_message "[$project_name] Merge fallido"
+        show_conflicts
+        blue_title_message "[$project_name] Try to abort merge (git merge --abort)..."
+        abort_merge
+        green_title_message "[$project_name] Merge aborted!"
 
-        failedProjects+=($project_name)
+        failed_projects+=($project_name)
     else
-        okProjects+=($project_name)
+        ok_projects+=($project_name)
+        green_title_message "[$project_name] Merged!."
     fi
 
     # ask
-    greenTitleMessage "[$project_name] Merged!."
     echo ""
 }
 
-function updateCall(){
-    update /home/prez/awto/awto-gowgo-migration-project gowgo
-    update $MICROSERVICES/ms-model ms-model
-    update $MICROSERVICES/ms-membership ms-membership
-    update $MICROSERVICES/ms-datatables ms-datatables
-    update $MICROSERVICES/ms-invoicing ms-invoicing
-    update $MICROSERVICES/ms-marketplace ms-marketplace
-    update $MICROSERVICES/ms-payments ms-payments
-    update $MICROSERVICES/ms-trips ms-trips
-    update $MICROSERVICES/ms-users ms-users
+function pull_call(){
+    pull $GOWGO_PATH gowgo
+    pull $MICROSERVICES/ms-model ms-model
+    pull $MICROSERVICES/ms-membership ms-membership
+    pull $MICROSERVICES/ms-datatables ms-datatables
+    pull $MICROSERVICES/ms-invoicing ms-invoicing
+    pull $MICROSERVICES/ms-marketplace ms-marketplace
+    pull $MICROSERVICES/ms-payments ms-payments
+    pull $MICROSERVICES/ms-trips ms-trips
+    pull $MICROSERVICES/ms-users ms-users
 }
 
-function mergeCall(){
-    merge /home/prez/awto/awto-gowgo-migration-project gowgo
+function merge_call(){
+    merge $GOWGO_PATH gowgo
     merge $MICROSERVICES/ms-model ms-model
     merge $MICROSERVICES/ms-membership ms-membership
     merge $MICROSERVICES/ms-datatables ms-datatables
@@ -123,20 +127,21 @@ function mergeCall(){
     merge $MICROSERVICES/ms-users ms-users
 }
 
-function showResults(){
-    greenTitleMessage "MERGED $MAIN_BRANCH into $WORK_BRANCH"
-    for project in ${okProjects[@]}; do
+function show_results(){
+    green_title_message "MERGED $MAIN_BRANCH into $WORK_BRANCH"
+    for project in ${ok_projects[@]}; do
         echo -e "\e[32m✔\e[0m $project"
     done
 
     echo ""
 
-    redTitleMessage "FAILED (Merge was aborted)"
-    for project in ${failedProjects[@]}; do
-        echo -e "\e[31m✘\e[0m $project"
+    red_title_message "FAILED (Merge was aborted)"
+
+    for i in "${!failed_projects[@]}"; do 
+        echo -e "\e[31m✘\e[0m ${failed_projects[$i]} (${conflict_files_counts[$i]})"
     done
 }
 
-updateCall
-mergeCall
-showResults
+pull_call
+merge_call
+show_results
