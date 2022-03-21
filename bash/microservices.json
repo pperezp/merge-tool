@@ -2,7 +2,6 @@
     "mainBranch":"master",
     "workBranch":"feature/GOW-2845",
     "projects":[
-        "/home/prez/awto/awto-gowgo-migration-project",
         "/home/prez/awto/microservices/ms-model",
         "/home/prez/awto/microservices/ms-membership",
         "/home/prez/awto/microservices/ms-datatables",

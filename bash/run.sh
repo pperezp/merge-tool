@@ -1,3 +1,4 @@
 #!/bin/bash
 
-sh merge.sh
+# $1 the json config file name
+sh merge.sh $1
