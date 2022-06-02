@@ -90,6 +90,20 @@ function pull() {
     echo ""
 }
 
+function pull_work_branch() {
+    folder=$1
+    cd $folder
+    project_name=${PWD##*/}
+
+    blue_title_message "Pull $project_name [$WORK_BRANCH]..."
+
+    git checkout $WORK_BRANCH
+    git pull
+    green_title_message "$project_name has pulled! [$WORK_BRANCH]"
+    
+    echo ""
+}
+
 function merge() {
     folder=$1
     cd $folder
@@ -119,6 +133,12 @@ function merge() {
 function pull_call() {
     for project in ${PROJECTS[@]}; do
         pull $project
+    done
+}
+
+function pull_work_branch_call() {
+    for project in ${PROJECTS[@]}; do
+        pull_work_branch $project
     done
 }
 
@@ -177,6 +197,7 @@ function show_config_file_information() {
 }
 
 show_config_file_information
+pull_work_branch_call
 pull_call
 merge_call
 show_results
