@@ -2,14 +2,16 @@
     "mainBranch":"master",
     "workBranch":"feature/GOW-3642",
     "projects":[
-        "/home/prez/awto/microservices/ms-model",
-        "/home/prez/awto/microservices/ms-membership",
+        "/home/prez/awto/microservices/ms-api-admin",
+        "/home/prez/awto/microservices/ms-calculator",
         "/home/prez/awto/microservices/ms-datatables",
         "/home/prez/awto/microservices/ms-invoicing",
         "/home/prez/awto/microservices/ms-marketplace",
+        "/home/prez/awto/microservices/ms-membership",
+        "/home/prez/awto/microservices/ms-model",
         "/home/prez/awto/microservices/ms-payments",
         "/home/prez/awto/microservices/ms-trips",
         "/home/prez/awto/microservices/ms-users",
-        "/home/prez/awto/awto-gowgo-migration-project"
+        "/home/prez/awto/microservices/awto-gowgo-migration-project"
     ]
 }
