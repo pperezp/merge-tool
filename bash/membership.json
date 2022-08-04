@@ -12,6 +12,7 @@
         "/home/prez/awto/microservices/ms-payments",
         "/home/prez/awto/microservices/ms-trips",
         "/home/prez/awto/microservices/ms-users",
-        "/home/prez/awto/microservices/awto-gowgo-migration-project"
+        "/home/prez/awto/microservices/awto-gowgo-migration-project",
+	"/home/prez/awto/microservices/gowgo-database-model"
     ]
 }
