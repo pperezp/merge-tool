@@ -1,0 +1,7 @@
+{
+    "mainBranch":"master",
+    "workBranch":"feature/GOW-3642",
+    "projects":[
+        "/home/prez/awto/microservices/awto-gowgo-migration-project"
+    ]
+}

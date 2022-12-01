@@ -7,12 +7,11 @@
         "/home/prez/awto/microservices/ms-datatables",
         "/home/prez/awto/microservices/ms-invoicing",
         "/home/prez/awto/microservices/ms-marketplace",
-        "/home/prez/awto/microservices/ms-membership",
         "/home/prez/awto/microservices/ms-model",
         "/home/prez/awto/microservices/ms-payments",
         "/home/prez/awto/microservices/ms-trips",
         "/home/prez/awto/microservices/ms-users",
-        "/home/prez/awto/microservices/awto-gowgo-migration-project",
-	"/home/prez/awto/microservices/gowgo-database-model"
+	"/home/prez/awto/microservices/gowgo-database-model",
+	"/home/prez/awto/microservices/ms-gowgo-manager"
     ]
 }
